@@ -207,7 +207,7 @@
         console.log("[h-loader] Logging out...");
         localStorage.removeItem("mc_user");
         localStorage.removeItem("mc_bookings");
-        window.location.href = "../pages/signIn.html";
+        window.location.href = "../signIn.html";
       });
 
       console.log("[h-loader] user logged in → showing logout");
