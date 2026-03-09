@@ -170,57 +170,57 @@
 
 
   // ⭐ 7️⃣ SIGN-IN / SIGN-OUT LOGIC
-  function handleAuthButtons() {
+function handleAuthButtons() {
 
-    const user = JSON.parse(localStorage.getItem("mc_user"));
+  const user  = JSON.parse(localStorage.getItem("mc_user"));
+  const admin = JSON.parse(localStorage.getItem("mc_admin"));
 
-    const loginBtn  = document.querySelector("[data-auth='login']");
-    const signupBtn = document.querySelector("[data-auth='signup']");
-    const logoutBtn = document.querySelector("[data-auth='logout']");
+  const loginBtn  = document.querySelector("[data-auth='login']");
+  const signupBtn = document.querySelector("[data-auth='signup']");
+  const logoutBtn = document.querySelector("[data-auth='logout']");
 
-    if (!loginBtn || !signupBtn || !logoutBtn) return;
+  if (!loginBtn || !signupBtn || !logoutBtn) return;
 
-    // Detect any authentication page (signIn / signUp / login)
-    const url = location.pathname.toLowerCase();
-    const isAuthPage =
-      url.includes("signin") ||
-      url.includes("signup") ||
-      url.includes("login") ||
-      url.includes("register");
+  const url = location.pathname.toLowerCase();
+  const isAuthPage =
+    url.includes("signin") ||
+    url.includes("signup") ||
+    url.includes("login") ||
+    url.includes("register");
 
-    // Always hide logout button on signIn / signUp pages
-    if (isAuthPage) {
-      loginBtn.style.display = "inline-flex";
-      signupBtn.style.display = "inline-flex";
-      logoutBtn.style.display = "none";
-      console.log("[h-loader] Auth page detected → hiding logout");
-      return;
-    }
-
-    // If user is logged in → show logout
-    if (user) {
-      loginBtn.style.display = "none";
-      signupBtn.style.display = "none";
-      logoutBtn.style.display = "inline-flex";
-
-      logoutBtn.addEventListener("click", () => {
-        console.log("[h-loader] Logging out...");
-        localStorage.removeItem("mc_user");
-        localStorage.removeItem("mc_bookings");
-        window.location.href = "../signIn.html";
-      });
-
-      console.log("[h-loader] user logged in → showing logout");
-    }
-
-    // User NOT logged in → show login + signup
-    else {
-      loginBtn.style.display = "inline-flex";
-      signupBtn.style.display = "inline-flex";
-      logoutBtn.style.display = "none";
-      console.log("[h-loader] no user → showing login/signup");
-    }
+  if (isAuthPage) {
+    loginBtn.style.display = "inline-flex";
+    signupBtn.style.display = "inline-flex";
+    logoutBtn.style.display = "none";
+    console.log("[h-loader] Auth page detected → hiding logout");
+    return;
   }
+
+  // ✅ If ANY role logged in
+  if (user || admin) {
+
+    loginBtn.style.display = "none";
+    signupBtn.style.display = "none";
+    logoutBtn.style.display = "inline-flex";
+
+    logoutBtn.addEventListener("click", () => {
+      console.log("[h-loader] Logging out...");
+      localStorage.removeItem("mc_user");
+      localStorage.removeItem("mc_admin");
+      localStorage.removeItem("mc_bookings");
+      window.location.href = "./signIn.html";
+    });
+
+    console.log("[h-loader] user/admin logged in → showing logout");
+  }
+
+  else {
+    loginBtn.style.display = "inline-flex";
+    signupBtn.style.display = "inline-flex";
+    logoutBtn.style.display = "none";
+    console.log("[h-loader] no user → showing login/signup");
+  }
+}
 
 
 // 🏠 8️⃣ Dynamic Home redirection based on login role

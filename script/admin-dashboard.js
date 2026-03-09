@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       localStorage.removeItem("mc_admin");
-      window.location.href = "./admin_login.html";
+      window.location.href = "../admin_logIn.html";
     });
   }
 

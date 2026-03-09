@@ -218,29 +218,53 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      STEP 1 — PACKAGE
   ===================================================== */
-  document.querySelectorAll(".package-card").forEach(card => {
-    card.addEventListener("click", () => {
+ document.querySelectorAll(".package-card").forEach(card => {
 
-      document.querySelectorAll(".package-card")
-        .forEach(c => c.classList.remove("selected"));
+  card.addEventListener("click", () => {
 
-      card.classList.add("selected");
+    document.querySelectorAll(".package-card")
+      .forEach(c => c.classList.remove("selected"));
 
-      // selecting package disables custom
-      booking.isCustom = false;
-      booking.customServices = [];
-      booking.customTotalPrice = 0;
-      updateCustomTotalUI();
+    card.classList.add("selected");
 
-      booking.packageName = card.querySelector("h3")?.innerText?.trim() || "";
+    const type = card.dataset.type;
 
-      // price read from <strong>₹499</strong>
-      const strong = card.querySelector("strong");
-      let priceText = strong ? strong.innerText : "0";
-      priceText = priceText.replace(/[₹,\s]/g, "");
-      booking.packagePrice = Number(priceText) || 0;
-    });
+    // ⭐ CUSTOM PACKAGE
+    if (type === "CUSTOM") {
+
+      booking.isCustom = true;
+      booking.packageName = "Customized Service";
+      booking.packagePrice = 0;
+
+      customizeBox.style.display = "block";
+
+      return;
+    }
+
+    // ⭐ NORMAL PACKAGE
+    booking.isCustom = false;
+
+    booking.packageName =
+      card.querySelector("h3")?.innerText?.trim() || "";
+
+    const strong = card.querySelector("strong");
+
+    let priceText = strong ? strong.innerText : "0";
+    priceText = priceText.replace(/[₹,\s]/g, "");
+
+    booking.packagePrice = Number(priceText) || 0;
+
+    // clear custom selections
+    booking.customServices = [];
+    booking.customTotalPrice = 0;
+
+    document.querySelectorAll("#customizeOptions input[type='checkbox']")
+      .forEach(chk => chk.checked = false);
+
+    updateCustomTotalUI();
   });
+
+});
 
   document.getElementById("step1Next").onclick = () => {
     if (!booking.packageName && !booking.isCustom) {
@@ -254,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
      CUSTOMIZE SECTION
   ===================================================== */
   function setupCustomizeSection(serviceType) {
-    if (!customizeBox || !customizeOptionsDiv || !customTotalEl || !useCustomBtn) {
+    if (!customizeBox || !customizeOptionsDiv || !customTotalEl) {
       // if customization html not added yet
       return;
     }
@@ -293,23 +317,42 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     customizeOptionsDiv.querySelectorAll("input[type='checkbox']").forEach(chk => {
-      chk.addEventListener("change", () => {
-        const selected = [];
-        let total = 0;
+  chk.addEventListener("change", () => {
 
-        customizeOptionsDiv.querySelectorAll("input[type='checkbox']:checked").forEach(c => {
-          const name = c.dataset.name;
-          const price = Number(c.dataset.price || 0);
-          total += price;
-          selected.push({ name, price });
-        });
+    const selected = [];
+    let total = 0;
 
-        booking.customServices = selected;
-        booking.customTotalPrice = total;
+    customizeOptionsDiv.querySelectorAll("input[type='checkbox']:checked").forEach(c => {
+      const name = c.dataset.name;
+      const price = Number(c.dataset.price || 0);
 
-        updateCustomTotalUI();
-      });
+      total += price;
+      selected.push({ name, price });
     });
+
+    booking.customServices = selected;
+    booking.customTotalPrice = total;
+
+    // ✅ If user selects custom services -> auto select custom package
+    if (selected.length > 0) {
+
+  booking.isCustom = true;
+  booking.packageName = "Customized Service";
+  booking.packagePrice = 0;
+
+  // remove other packages
+  document.querySelectorAll(".package-card")
+    .forEach(c => c.classList.remove("selected"));
+
+  // ⭐ auto select customized service card
+  const customCard = document.querySelector('.package-card[data-type="CUSTOM"]');
+  if (customCard) {
+    customCard.classList.add("selected");
+  }
+}
+    updateCustomTotalUI();
+  });
+});
   }
 
   function updateCustomTotalUI() {
